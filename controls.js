@@ -13,38 +13,6 @@ let myChar = null;
 let currentPIDInfo = null;
 let globalListenerMode = "STREAMING";
 
-const websocket = new WebSocket('wss:obd2-nwij.onrender.com');
-websocket.onopen = function(event) {
-            console.log('Connected to the WebSocket server.');
-        };
-websocket.addEventListener('message', async (event) => {
-    try {
-        const instruction = JSON.parse(event.data);
-        // Example JSON: { "action": "request", "pid": "01 0C", "name": "RPM", "formula": "((A * 256) + B) / 4" }
-        console.log('Message from server: ' + event.data);
-        currentPIDInfo = instruction;
-        // Below we are assessing the command sent by python backend, in the future, a frontpage selection
-        // will determine what command python backend is sending to us. Function sendCommand tells the obd to give us
-        // the data dictated by json pid
-        if (instruction.action === "pidDisplay" && myChar) {
-            await sendCommand(myChar, instruction.pid);
-        }
-    } catch (err) {
-        console.error("Failed to parse JSON instruction", err);
-    }
-});
-function sendMessage(message) {
-            if (message) {
-                websocket.send(message); // Send message to the Python server
-            }
-        }
-websocket.onclose = function(event) {
-            console.log('Disconnected from the WebSocket server.');
-        };
-websocket.onerror = function(error) {
-            console.error('WebSocket error: ' + error.message);
-        };
-
 async function connectBluetooth() {
   try {
     console.log('Searching for devices...')
@@ -138,39 +106,6 @@ function requestRPM(){
   sendCommand(myChar, '010C');
 }
 
-// handleData function may be the meat and potatoes of this script, for the foreseeable future it will be
-// responsible for taking data from the obd and processing the data based on json instructions
-//
-function handleData(event, instruction) {// event is populated automatically when handleData function is called by eventlistener
-  // 1. CAPTURE: Get the raw binary buffer from the 'event'
-  const buffer = event.target.value; 
-
-  // 2. DECODE: Convert the binary (1s and 0s) into a Text String
-  const decoder = new TextDecoder();
-  const textResponse = decoder.decode(buffer);
-
-  // 3. CLEAN: Remove weird characters like > or \r
-  const cleanResponse = textResponse.replace(/>|\r/g, '').trim();
-
-  //console.log("The car just said:", cleanResponse);
-
-  //RPM parse test
-  // 1. Split the string into an array: ["41", "0C", "0F", "A0"]
-  const parts = cleanResponse.split(' ');
-
-  // 2. Identify the data bytes (usually at index 2 and 3)
-  const A = parseInt(parts[2], 16);
-  const B = parseInt(parts[3], 16);
-
-  // 3. Do the math
-  const rpm = ((A * 256) + B) / 4;
-  
-  console.log('RPMs: ', rpm); // 4000
-
-  
-  // Now you can send 'cleanResponse' to your React Dashboard!
-}
-
 function masterParse(cleanResponse, formula) {
     const parts = cleanResponse.split(' ');
     
@@ -198,7 +133,3 @@ function masterParse(cleanResponse, formula) {
 }
 
 
-  // Now 'myChar' is the active pipe.
-  // You can pass it to other functions now:
-  //setupListener(myChar);
-  //askForRPM(myChar);
