@@ -1,0 +1,8 @@
+[
+{
+"action": "pidDisplay",
+"pid": "01 0C",
+"name": "RPM",
+"formula": "((A * 256) + B) / 4"
+}
+]
