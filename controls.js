@@ -11,6 +11,7 @@
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let myChar = null;
 let currentPIDInfo = null;
+let pidMap = new Map(); // Global storage for your PIDs
 let globalListenerMode = "STREAMING";
 
 async function connectBluetooth() {
@@ -82,6 +83,33 @@ function globalListener(characteristic) {
     });
 }
 
+async function loadPidLibrary() {
+    // Replace this URL with your actual GitHub Pages URL later
+    //const url = 'https://raw.githubusercontent.com/username/repo/main/pids/generic.json';
+
+    try {
+        const response = await fetch('globalpids.json');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Convert the Array to a Map for O(1) lookup speed
+        // This lets you find a PID instantly using: pidMap.get("010C")
+        pidMap = new Map(data.map(obj => [obj.id, obj]));
+
+        console.log("OBD-II Library Loaded:", pidMap.size, "PIDs ready.");
+        
+        // Trigger your UI render once data is in
+        //renderPidList();
+
+    } catch (error) {
+        console.error("Failed to load PID library:", error);
+    }
+}
+
 
 // sendCommand is a send-instructions-to-the-obd function.
 // Remember we already have a obd listener(myChar) set up in bluetooth connection function
@@ -102,8 +130,9 @@ async function connectbutton (){
 
 // requestRPM function will be deprecated
 function requestRPM(){
-  console.log('Function askForRPM working now...');
-  sendCommand(myChar, '010C');
+  //console.log('Function askForRPM working now...');
+  //sendCommand(myChar, '010C');
+  loadPidLibrary();
 }
 
 function masterParse(cleanResponse, formula) {
