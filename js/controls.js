@@ -1,49 +1,13 @@
 // Tickets:
 // 1. Need auto detect for service id and char id
 
-const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
-let myChar = null;
+import { connectBluetooth, sendCommand } from './ConnectionManager.js';
+
 let currentPIDInfo = null;
 let pidMap = new Map(); // Global storage for your PIDs
 let globalListenerMode = null;
 
-async function connectBluetooth() {
-  try {
-    console.log('Searching for devices...')
-    const device = await navigator.bluetooth.requestDevice({
-        filters: [{namePrefix: 'vLinker MC-IOS'}],
-        optionalServices: [ELM327_SERVICE_UUID]
 
-    });
-
-    console.log('Connecting to GATT Server...');
-    const server = await device.gatt.connect();
-    console.log('Connected:', device.name);
-
-    const service = await server.getPrimaryService(ELM327_SERVICE_UUID);
-    const characteristic = await service.getCharacteristic('bef8d6c9-9c21-4c9e-b632-bd58c1009f9f');
-    // The following code is for detecting all available service uuids obviously
-    //const characteristics = await service.getCharacteristics();
-    //characteristics.forEach(c => {
-    //    console.log('Found characteristic UUID:', c.uuid);
-    //});
-
-    // Below we are opening the listening pipeline to recieve data from the OBD device. 
-    // Function handleData will handle data lol, based on json instruction
-    // 
-    // This listening pipeline gets passed to variable myChar
-    //
-    // const tempHandler = (event) => handleData(event, instruction);
-    // characteristic.addEventListener('characteristicvaluechanged', tempHandler);
-    globalListener(characteristic);
-    await characteristic.startNotifications();
-    
-    return characteristic;
-    
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
 
 function globalListener(characteristic) {
     characteristic.addEventListener('characteristicvaluechanged', (event) => {
@@ -84,7 +48,7 @@ async function loadPidLibrary() {
     //const url = 'https://raw.githubusercontent.com/username/repo/main/pids/generic.json';
 
     try {
-        const response = await fetch('globalpids.json');
+        const response = await fetch('pids/globalpids.json');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -109,14 +73,7 @@ async function loadPidLibrary() {
 }
 
 
-// sendCommand is a send-instructions-to-the-obd function.
-// Remember we already have a obd listener(myChar) set up in bluetooth connection function
-async function sendCommand(characteristic, command) {
-  const encoder = new TextEncoder();
-  // Commands must end with \r for the ELM327 to process them
-  const data = encoder.encode(command + '\r');
-  await characteristic.writeValue(data);
-}
+
 
 // connectButton is where myChar goes from null to having obd receiving pipeline assigned to it
 // This will be handled by a simple frontpage button for the foreseeable future
