@@ -1,18 +1,11 @@
 // Tickets:
-// 4. Need auto detect for service id and char id
-// 5. ***** handleData deprecate, to be replaced with global pid listener *****
-//    - global pid listener will be called in bluetooth connection function instead of tempHandler
-//    - global pid listener will include mode switch for pids/dtcs
-//    - clean response processing will move to global pid listener
-//    - global pid listener will also use master parse to process, and future display function to sent to frontpage
-//    - Python backend will take pid list request, then cycle through large pid list 
-
+// 1. Need auto detect for service id and char id
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let myChar = null;
 let currentPIDInfo = null;
 let pidMap = new Map(); // Global storage for your PIDs
-let globalListenerMode = "STREAMING";
+let globalListenerMode = null;
 
 async function connectBluetooth() {
   try {
@@ -83,6 +76,9 @@ function globalListener(characteristic) {
     });
 }
 
+// function loadPidLibrary will obviously load a json pid list as per a frontpage selection, 
+// based on the vehicle being worked on. In the future it will require a fall back to the global
+// pid list should it fail to find a manufacturer specific one
 async function loadPidLibrary() {
     // Replace this URL with your actual GitHub Pages URL later
     //const url = 'https://raw.githubusercontent.com/username/repo/main/pids/generic.json';
@@ -102,6 +98,8 @@ async function loadPidLibrary() {
 
         console.log("OBD-II Library Loaded:", pidMap.size, "PIDs ready.");
         
+        currentPIDInfo = pidMap.get("010C");
+
         // Trigger your UI render once data is in
         //renderPidList();
 
@@ -125,7 +123,8 @@ async function sendCommand(characteristic, command) {
 async function connectbutton (){
   myChar = await connectBluetooth();
   console.log('Bluetooth connected...');
-  
+  globalListenerMode = "STREAMING";
+  console.log('Streaming mode is now active...');
 }
 
 // requestRPM function will be deprecated
