@@ -128,10 +128,11 @@ async function connectbutton (){
 }
 
 // requestRPM function will be deprecated
-function requestRPM(){
+async function requestRPM(){
   //console.log('Function askForRPM working now...');
   //sendCommand(myChar, '010C');
-  loadPidLibrary();
+  await loadPidLibrary();
+  renderLiveDashboard();
 }
 
 function masterParse(cleanResponse, formula) {
@@ -160,22 +161,19 @@ function masterParse(cleanResponse, formula) {
     }
 }
 
-function displayPidList(pids) {
-    const container = document.getElementById('pid-list-container');
+function renderLiveDashboard() {
+    const displayArea = document.getElementById('pid-list-container');
+    let htmlContent = "";
 
-    const htmlContent = pids.map(pid => `
-        <div class="pid-row" id="row-${pid.id}" style="padding: 10px 0;">
-            <div style="display: flex; justify-content: space-between;">
-                <span><strong>${pid.name}</strong> <small>(${pid.id})</small></span>
-                <span style="font-family: monospace; font-weight: bold;">
-                    <span id="val-${pid.id}">--</span> 
-                    <span style="color: #888;">${pid.unit}</span>
-                </span>
+    pidMap.forEach((pid, id) => {
+        htmlContent += `
+            <div class="pid-box" style="border: 1px solid #444; margin: 5px; padding: 10px;">
+                <strong style="color: #ff8c00;">${pid.name}</strong><br>
+                <span style="font-size: 1.5em;" id="val-${pid.id}">--</span> ${pid.unit}
             </div>
-        </div>
-    `).join('<hr style="border:0; border-top:1px solid #eee; margin:0;">');
-
-    container.innerHTML = htmlContent;
+            <hr>
+        `;
+    });
+    displayArea.innerHTML = htmlContent;
 }
-
 
