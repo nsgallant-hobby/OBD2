@@ -128,7 +128,7 @@ async function connectbutton (){
 }
 
 // requestRPM function will be deprecated
-async function requestRPM(){
+async function LoadPidList(){
   //console.log('Function askForRPM working now...');
   //sendCommand(myChar, '010C');
   await loadPidLibrary();
@@ -165,11 +165,11 @@ function renderLiveDashboard() {
     const displayArea = document.getElementById('pid-list-container');
     let htmlContent = "";
 
-    pidMap.forEach((pid, id) => {
+    pidMap.forEach((dataLine, id) => {
         htmlContent += `
             <div class="pid-box" style="border: 1px solid #444; margin: 5px; padding: 10px;">
-                <strong style="color: #ff8c00;">${pid.name}</strong><br>
-                <span style="font-size: 1.5em;" id="val-${pid.id}">--</span> ${pid.unit}
+                <strong style="color: #ff8c00;">${dataLine.name}</strong><br>
+                <span style="font-size: 1.5em;" id="val-${id}">--</span> ${dataLine.unit}
             </div>
             <hr>
         `;

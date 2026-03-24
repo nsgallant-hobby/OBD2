@@ -1,10 +1,44 @@
 [
-    {
-    "id": "id For testing",
-    "unit": "unit For testing",
-    "action": "pidDisplay",
-    "pid": "01 0C",
-    "name": "RPM",
-    "formula": "((A * 256) + B) / 4"
-    }
+  {
+    "id": "010C",
+    "name": "Engine RPM",
+    "formula": "((256 * A) + B) / 4",
+    "unit": "RPM",
+    "description": "Engine rotations per minute"
+  },
+  {
+    "id": "010D",
+    "name": "Vehicle Speed",
+    "formula": "A",
+    "unit": "km/h",
+    "description": "Current speed of the vehicle"
+  },
+  {
+    "id": "0105",
+    "name": "Engine Coolant Temp",
+    "formula": "A - 40",
+    "unit": "°C",
+    "description": "Temperature of the engine coolant"
+  },
+  {
+    "id": "0111",
+    "name": "Throttle Position",
+    "formula": "(A * 100) / 255",
+    "unit": "%",
+    "description": "Percentage of throttle opening"
+  },
+  {
+    "id": "0104",
+    "name": "Calculated Engine Load",
+    "formula": "(A * 100) / 255",
+    "unit": "%",
+    "description": "Current engine load percentage"
+  },
+  {
+    "id": "010F",
+    "name": "Intake Air Temp",
+    "formula": "A - 40",
+    "unit": "°C",
+    "description": "Temperature of air entering the engine"
+  }
 ]
