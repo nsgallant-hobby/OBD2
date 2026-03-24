@@ -160,4 +160,22 @@ function masterParse(cleanResponse, formula) {
     }
 }
 
+function displayPidList(pids) {
+    const container = document.getElementById('pid-list-container');
+
+    const htmlContent = pids.map(pid => `
+        <div class="pid-row" id="row-${pid.id}" style="padding: 10px 0;">
+            <div style="display: flex; justify-content: space-between;">
+                <span><strong>${pid.name}</strong> <small>(${pid.id})</small></span>
+                <span style="font-family: monospace; font-weight: bold;">
+                    <span id="val-${pid.id}">--</span> 
+                    <span style="color: #888;">${pid.unit}</span>
+                </span>
+            </div>
+        </div>
+    `).join('<hr style="border:0; border-top:1px solid #eee; margin:0;">');
+
+    container.innerHTML = htmlContent;
+}
+
 
