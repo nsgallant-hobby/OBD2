@@ -1,4 +1,4 @@
-import { sendCommand } from './connection.js';
+//import { sendCommand } from './connection.js';
 
 export const MODES = {
     IDLE: 'IDLE',
@@ -14,11 +14,11 @@ export function setScannerMode(newMode) {
     currentMode = newMode;
     
     // Logic to handle the switch
-    if (newMode === MODES.READING_VIN) {
-        sendCommand("0902"); // OBD-II command for VIN
-    } else if (newMode === MODES.READING_DTC) {
-        sendCommand("03");   // OBD-II command for stored codes
-    }
+    //if (newMode === MODES.READING_VIN) {
+    //    sendCommand("0902"); // OBD-II command for VIN
+    //} else if (newMode === MODES.READING_DTC) {
+    //    sendCommand("03");   // OBD-II command for stored codes
+    //}
 }
 
 export function getCurrentMode() {

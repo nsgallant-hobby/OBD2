@@ -1,3 +1,5 @@
+import { getCurrentMode, MODES } from './ScannerMode.js';
+
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let characteristic = null;
 
@@ -55,4 +57,35 @@ export async function sendCommand(command) {
     // Commands must end with \r for the ELM327 to process them
     const data = encoder.encode(command + '\r');
     await pipe.writeValue(data);
+}
+
+export function globalListener(characteristic) {
+    characteristic.addEventListener('characteristicvaluechanged', (event) => {
+        // const raw = event.target.value;
+        // const hex = new TextDecoder().decode(raw);
+        // 1. CAPTURE: Get the raw binary buffer from the 'event'
+        const buffer = event.target.value; 
+
+        // 2. DECODE: Convert the binary (1s and 0s) into a Text String
+        const decoder = new TextDecoder();
+        const textResponse = decoder.decode(buffer);
+
+        // 3. CLEAN: Remove weird characters like > or \r
+        const cleanResponse = textResponse.replace(/>|\r/g, '').trim();
+
+        // Safety check: ensure we know what we just asked for
+        if (getCurrentMode === MODES.STREAMING_PIDS) {
+            // Fast math for RPM, Speed, etc.
+            //const result = masterParse(cleanResponse, currentPIDInfo.formula);
+            //console.log('RPMs: ', result); 
+            // updateGauges(result); 
+            // ****************************************** 
+            // This is where PID update will be sent to front page
+            // The speed of PID update will be determined in python backend
+        } 
+        else if (getCurrentMode === MODES.READING_DTC) {
+            // Buffer and decode fault codes (e.g., 43 01 03 00 -> P0103)
+            // processDTCBuffer(hex);
+        }
+    });
 }
