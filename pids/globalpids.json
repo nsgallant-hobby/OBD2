@@ -4,41 +4,47 @@
     "name": "Engine RPM",
     "formula": "((256 * A) + B) / 4",
     "unit": "RPM",
-    "description": "Engine rotations per minute"
+    "description": "Engine rotations per minute", 
+    "refreshrate": 50
   },
   {
     "id": "010D",
     "name": "Vehicle Speed",
     "formula": "A",
     "unit": "km/h",
-    "description": "Current speed of the vehicle"
+    "description": "Current speed of the vehicle", 
+    "refreshrate": 100
   },
   {
     "id": "0105",
     "name": "Engine Coolant Temp",
     "formula": "A - 40",
     "unit": "°C",
-    "description": "Temperature of the engine coolant"
+    "description": "Temperature of the engine coolant", 
+    "refreshrate": 5000
   },
   {
     "id": "0111",
     "name": "Throttle Position",
     "formula": "(A * 100) / 255",
     "unit": "%",
-    "description": "Percentage of throttle opening"
+    "description": "Percentage of throttle opening",
+    "refreshrate": 100
   },
   {
     "id": "0104",
     "name": "Calculated Engine Load",
     "formula": "(A * 100) / 255",
     "unit": "%",
-    "description": "Current engine load percentage"
+    "description": "Current engine load percentage",
+    "refreshrate": 100
   },
   {
     "id": "010F",
     "name": "Intake Air Temp",
     "formula": "A - 40",
     "unit": "°C",
-    "description": "Temperature of air entering the engine"
+    "description": "Temperature of air entering the engine",
+    "refreshrate": 5000
   }
 ]

@@ -1,3 +1,5 @@
+let pidMap = new Map()
+
 export async function loadPidLibrary() {
     // Replace this URL with your actual GitHub Pages URL later
     //const url = 'https://raw.githubusercontent.com/username/repo/main/pids/generic.json';
@@ -13,14 +15,18 @@ export async function loadPidLibrary() {
 
         // Convert the Array to a Map for O(1) lookup speed
         // This lets you find a PID instantly using: pidMap.get("010C")
-        const pidMap = new Map(data.map(obj => [obj.id, obj]));
+        pidMap = new Map(data.map(obj => [obj.id, obj]));
 
         console.log("OBD-II Library Loaded:", pidMap.size, "PIDs ready.");
-        return pidMap;
+        //return pidMap;
         // Trigger your UI render once data is in
         //renderPidList();
 
     } catch (error) {
         console.error("Failed to load PID library:", error);
     }
+}
+
+export function getPidMap() {
+    return pidMap;
 }

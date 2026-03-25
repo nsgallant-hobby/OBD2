@@ -1,13 +1,6 @@
-import { loadPidLibrary } from './LoadLibrary.js';
+import { loadPidLibrary, getPidMap } from './LoadLibrary.js';
 import { connectBluetooth, sendCommand } from './ConnectionManager.js';
-
-let pidMap = new Map(); // Global storage for your PIDs
-
-// connectButton is where myChar goes from null to having obd receiving pipeline assigned to it
-// This will be handled by a simple frontpage button for the foreseeable future
-
-//import { connectToDevice } from './connection.js';
-//import { loadVehicleLibrary } from './loader.js';
+import { renderPidList } from './RenderPids.js';
 
 // Wait for the DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,24 +12,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('LoadPidList').addEventListener('click', async () => {
-        pidMap = await loadPidLibrary();
-        renderLiveDashboard();
+        await loadPidLibrary();
+        renderPidList();
+        startSmartStreaming();
     });
 });
 
-function renderLiveDashboard() {
-    const displayArea = document.getElementById('pid-list-container');
-    let htmlContent = "";
+let schedulerInterval = null;
+let pidMap = getPidMap();
 
-    pidMap.forEach((dataLine, id) => {
-        htmlContent += `
-            <div class="pid-box" style="border: 1px solid #444; margin: 5px; padding: 10px;">
-                <strong style="color: #ff8c00;">${dataLine.name}</strong><br>
-                <span style="font-size: 1.5em;" id="val-${id}">--</span> ${dataLine.unit}
-            </div>
-            <hr>
-        `;
-    });
-    displayArea.innerHTML = htmlContent;
+export function startSmartStreaming() {
+    
+    if (schedulerInterval) clearInterval(schedulerInterval);
+
+    // We run the 'manager' very fast (e.g., every 10ms) 
+    // to check if any PIDs are "due" for an update
+    schedulerInterval = setInterval(async () => {
+        const now = Date.now();
+
+        for (const [id, pid] of pidMap) {
+            // Calculate how long it's been since this specific PID was updated
+            const timeSinceLastUpdate = now - (pid.lastRequested || 0);
+
+            // If enough time has passed based on its custom refreshRate
+            if (timeSinceLastUpdate >= (pid.refreshRate || 500)) {
+                
+                // 1. Mark the time we sent the request
+                pid.lastRequested = now;
+
+                // 2. Send the command
+                await sendCommand(id);
+
+                // 3. Tiny breather so commands don't collide on the wire
+                await new Promise(r => setTimeout(r, 20));
+            }
+        }
+    }, 10); 
+}
+
+export function stopSmartStreaming() {
+    clearInterval(liveInterval);
+    liveInterval = null;
+    console.log("Stream stopped.");
 }
 
