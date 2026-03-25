@@ -1,39 +1,28 @@
-
+import { loadPidLibrary } from './LoadLibrary.js';
 import { connectBluetooth, sendCommand } from './ConnectionManager.js';
 
-let currentPIDInfo = null;
 let pidMap = new Map(); // Global storage for your PIDs
-let globalListenerMode = null;
-
-
-
-
-
-// function loadPidLibrary will obviously load a json pid list as per a frontpage selection, 
-// based on the vehicle being worked on. In the future it will require a fall back to the global
-// pid list should it fail to find a manufacturer specific one
-
-
-
 
 // connectButton is where myChar goes from null to having obd receiving pipeline assigned to it
 // This will be handled by a simple frontpage button for the foreseeable future
-async function connectbutton (){
-  myChar = await connectBluetooth();
-  console.log('Bluetooth connected...');
-  globalListenerMode = "STREAMING";
-  console.log('Streaming mode is now active...');
-}
 
-// requestRPM function will be deprecated
-async function LoadPidList(){
-  //console.log('Function askForRPM working now...');
-  //sendCommand(myChar, '010C');
-  await loadPidLibrary();
-  renderLiveDashboard();
-}
+//import { connectToDevice } from './connection.js';
+//import { loadVehicleLibrary } from './loader.js';
 
+// Wait for the DOM to be ready
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Attach the logic to the button ID
+    document.getElementById('connectbutton').addEventListener('click', async () => {
+        console.log("Connect clicked!");
+        await connectBluetooth();
+    });
 
+    document.getElementById('LoadPidList').addEventListener('click', async () => {
+        pidMap = await loadPidLibrary();
+        renderLiveDashboard();
+    });
+});
 
 function renderLiveDashboard() {
     const displayArea = document.getElementById('pid-list-container');
