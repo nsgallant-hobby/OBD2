@@ -1,6 +1,7 @@
-import { loadPidLibrary, getPidMap } from './LoadLibrary.js';
+import { loadPidLibrary } from './LoadLibrary.js';
 import { connectBluetooth, sendCommand } from './ConnectionManager.js';
 import { renderPidList } from './RenderPids.js';
+import { pidMap } from './PidMapStore.js';
 
 // Wait for the DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let schedulerInterval = null;
-let pidMap = getPidMap();
 
 export function startSmartStreaming() {
     

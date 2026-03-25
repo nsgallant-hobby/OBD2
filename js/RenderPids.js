@@ -1,10 +1,9 @@
-import { getPidMap } from "./LoadLibrary.js";
+import { pidMap } from './PidMapStore.js';
 
 export function renderPidList() {
     const displayArea = document.getElementById('pid-list-container');
     let htmlContent = "";
-    let pidMap = getPidMap();
-
+    
     pidMap.forEach((dataLine, id) => {
         htmlContent += `
             <div class="pid-box" style="border: 1px solid #444; margin: 5px; padding: 10px;">

@@ -1,3 +1,5 @@
+import { updateStore } from './PidMapStore.js';
+
 let pidMap = new Map()
 
 export async function loadPidLibrary() {
@@ -16,6 +18,7 @@ export async function loadPidLibrary() {
         // Convert the Array to a Map for O(1) lookup speed
         // This lets you find a PID instantly using: pidMap.get("010C")
         pidMap = new Map(data.map(obj => [obj.id, obj]));
+        updateStore(pidMap);
 
         console.log("OBD-II Library Loaded:", pidMap.size, "PIDs ready.");
         //return pidMap;
@@ -27,6 +30,4 @@ export async function loadPidLibrary() {
     }
 }
 
-export function getPidMap() {
-    return pidMap;
-}
+

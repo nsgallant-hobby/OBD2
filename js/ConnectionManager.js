@@ -1,4 +1,6 @@
 import { getCurrentMode, MODES } from './ScannerMode.js';
+import { pidMap } from './PidMapStore.js';
+import { updatePidValue } from './RenderPids.js';
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let characteristic = null;
@@ -78,11 +80,21 @@ export function globalListener(characteristic) {
             // Fast math for RPM, Speed, etc.
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
-            // updateGauges(result); 
-            // ****************************************** 
-            // This is where PID update will be sent to front page
-            // The speed of PID update will be determined in python backend
+            //updatePidValue() 
+            if (raw.startsWith("41")) {
+                const pidId = "01" + cleanResponse.substring(2, 4); // e.g., "010C"
+                const pidInfo = pidMap.get(pidId);
+
+                if (pidInfo) {
+                    // Call the Master Parser (Brain)
+                    //const processedValue = masterParser.calculate(raw, pidInfo);
+
+                    // 3. UI UPDATE (Face)
+                    //ui.updateValue(pidId, processedValue);
+                }
+            }
         } 
+
         else if (getCurrentMode === MODES.READING_DTC) {
             // Buffer and decode fault codes (e.g., 43 01 03 00 -> P0103)
             // processDTCBuffer(hex);
