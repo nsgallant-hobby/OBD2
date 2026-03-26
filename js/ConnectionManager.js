@@ -63,7 +63,7 @@ export async function sendCommand(command) {
     await pipe.writeValue(data);
 }
 
-export function globalListener(characteristic) {
+export async function globalListener(characteristic) {
     characteristic.addEventListener('characteristicvaluechanged', (event) => {
         // const raw = event.target.value;
         // const hex = new TextDecoder().decode(raw);
@@ -76,7 +76,7 @@ export function globalListener(characteristic) {
 
         // 3. CLEAN: Remove weird characters like > or \r
         const cleanResponse = textResponse.replace(/>|\r/g, '').trim();
-
+        console.log("Clean response = ", cleanResponse);
         // Safety check: ensure we know what we just asked for
         if (getCurrentMode === MODES.STREAMING_PIDS) {
             // Fast math for RPM, Speed, etc.
