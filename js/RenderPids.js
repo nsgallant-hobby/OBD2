@@ -17,6 +17,7 @@ export function renderPidList() {
 }
 
 export function updatePidValue(pidId, newValue) {
+    console.log("updatePidValue is attempting to run...");
     // This finds the <span id="val-010C"> we created during render
     const element = document.getElementById(`val-${pidId}`);
     if (element) {

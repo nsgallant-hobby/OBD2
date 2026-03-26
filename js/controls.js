@@ -29,7 +29,7 @@ export function startSmartStreaming() {
     // to check if any PIDs are "due" for an update
     schedulerInterval = setInterval(async () => {
         const now = Date.now();
-
+        
         for (const [id, pid] of pidMap) {
             // Calculate how long it's been since this specific PID was updated
             const timeSinceLastUpdate = now - (pid.lastRequested || 0);
@@ -39,12 +39,21 @@ export function startSmartStreaming() {
                 
                 // 1. Mark the time we sent the request
                 pid.lastRequested = now;
-
+                //await new Promise(r => setTimeout(r, 50));
                 // 2. Send the command
+                try {
+                console.log("Sending command ", id);
                 await sendCommand(id);
-
+                } catch(error) {
+                    console.log("Error caught", error);
+                    if (error.message.includes("GATT")) {
+                    // Just move to the next PID in the loop; 
+                    // this one will try again on the next cycle.
+                    continue; 
+                    }
+                }
                 // 3. Tiny breather so commands don't collide on the wire
-                await new Promise(r => setTimeout(r, 20));
+                await new Promise(r => setTimeout(r, 2000));
             }
         }
     }, 10); 

@@ -1,6 +1,7 @@
 import { getCurrentMode, MODES } from './ScannerMode.js';
 import { pidMap } from './PidMapStore.js';
 import { updatePidValue } from './RenderPids.js';
+import { masterParse } from './MasterParser.js';
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let characteristic = null;
@@ -19,7 +20,7 @@ export async function connectBluetooth() {
     console.log('Connected:', device.name);
 
     const service = await server.getPrimaryService(ELM327_SERVICE_UUID);
-    const characteristic = await service.getCharacteristic('bef8d6c9-9c21-4c9e-b632-bd58c1009f9f');
+    characteristic = await service.getCharacteristic('bef8d6c9-9c21-4c9e-b632-bd58c1009f9f');
     // The following code is for detecting all available service uuids obviously
     //const characteristics = await service.getCharacteristics();
     //characteristics.forEach(c => {
@@ -43,8 +44,8 @@ export async function connectBluetooth() {
   }
 }
 
-export function getPipeline() {
-    if (!characteristic) {
+export async function getPipeline() {
+    if (!characteristic || !characteristic.service.device.gatt.connected) {
         console.warn("Attempted to access pipeline before connection!");
         return null;
     }
@@ -54,7 +55,8 @@ export function getPipeline() {
 // sendCommand is a send-instructions-to-the-obd function.
 // Remember we already have a obd listener(myChar) set up in bluetooth connection function
 export async function sendCommand(command) {
-    const pipe = getPipeline();
+    const pipe = await getPipeline();
+    //console.log("Pipe object:", pipe);
     const encoder = new TextEncoder();
     // Commands must end with \r for the ELM327 to process them
     const data = encoder.encode(command + '\r');
@@ -83,14 +85,14 @@ export function globalListener(characteristic) {
             //updatePidValue() 
             if (raw.startsWith("41")) {
                 const pidId = "01" + cleanResponse.substring(2, 4); // e.g., "010C"
-                const pidInfo = pidMap.get(pidId);
+                const pidInfo = pidMap.get(id);
 
                 if (pidInfo) {
                     // Call the Master Parser (Brain)
-                    //const processedValue = masterParser.calculate(raw, pidInfo);
+                    const processedValue = masterParse(cleanResponse, pidInfo.formula);
 
                     // 3. UI UPDATE (Face)
-                    //ui.updateValue(pidId, processedValue);
+                    updatePidValue(pidId, processedValue);
                 }
             }
         } 
