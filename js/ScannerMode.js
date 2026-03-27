@@ -3,6 +3,7 @@
 export const MODES = {
     IDLE: 'IDLE',
     STREAMING_PIDS: 'STREAMING',
+    GET_ECM_HEADER: 'ECM',
     READING_VIN: 'VIN',
     READING_DTC: 'DTC'
 };

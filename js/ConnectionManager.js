@@ -6,6 +6,7 @@ import { masterParse } from './MasterParser.js';
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let characteristic = null;
 
+
 export async function connectBluetooth() {
   try {
     console.log('Searching for devices...')
