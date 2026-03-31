@@ -8,7 +8,7 @@ export const MODES = {
     READING_DTC: 'DTC'
 };
 
-let currentMode = MODES.IDLE;
+let currentMode = MODES.GET_ECM_HEADER;
 
 export function setScannerMode(newMode) {
     console.log(`Switching mode to: ${newMode}`);

@@ -2,10 +2,12 @@ import { getCurrentMode, MODES } from './ScannerMode.js';
 import { pidMap } from './PidMapStore.js';
 import { updatePidValue } from './RenderPids.js';
 import { masterParse } from './MasterParser.js';
+import { toggle_send_command_blocker } from './Promise.js';
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let characteristic = null;
-
+let ECMHeader = null;
+let pidInfo = null;
 
 export async function connectBluetooth() {
   try {
@@ -61,46 +63,94 @@ export async function sendCommand(command) {
     const encoder = new TextEncoder();
     // Commands must end with \r for the ELM327 to process them
     const data = encoder.encode(command + '\r');
+    console.log("Sending command:", command);
     await pipe.writeValue(data);
 }
 
 export async function globalListener(characteristic) {
     characteristic.addEventListener('characteristicvaluechanged', (event) => {
-        // const raw = event.target.value;
-        // const hex = new TextDecoder().decode(raw);
-        // 1. CAPTURE: Get the raw binary buffer from the 'event'
+         // 1. CAPTURE: Get the raw binary buffer from the 'event'
         const buffer = event.target.value; 
-
+    
         // 2. DECODE: Convert the binary (1s and 0s) into a Text String
         const decoder = new TextDecoder();
         const textResponse = decoder.decode(buffer);
 
         // 3. CLEAN: Remove weird characters like > or \r
-        const cleanResponse = textResponse.replace(/>|\r/g, '').trim();
+        // want to keep > for now, to signal end of multiline response from obd
+        // orignally line looked like this
+        // ...textResponse.replace(/>|\r/g, '')...
+        let cleanResponse = textResponse.replace(/|\r/g, '').trim();
         console.log("Clean response = ", cleanResponse);
+        if(cleanResponse === ">") toggle_send_command_blocker(); 
+        if(cleanResponse.length === 4 && !(cleanResponse === "SEAR")) {
+            pidInfo = cleanResponse;
+            console.log("Pid id = ", pidInfo);
+        }
+        console.log("pidInfo = ", pidInfo);
+        const landmark = "41 " + pidInfo.slice(-2);
+        console.log("landmark = ", landmark);
+        const landmarkIndex = cleanResponse.indexOf(landmark);
+        console.log("landmarkIndex = ", landmarkIndex);
+        
+        const count = cleanResponse.split(landmark).length - 1;
+        const isRepeated = count > 1; 
+        if(isRepeated){
+            const halfLength = Math.floor(cleanResponse.length / 2);
+            const firstHalf = cleanResponse.substring(0, halfLength);
+            if(firstHalf) cleanResponse = firstHalf;
+        }
+        //if (landmarkIndex !== -1) {
+            // 1. Everything BEFORE the landmark (minus the 1-byte PCI length) is the Header
+            // We subtract 2 hex characters to remove the '04' or '03' length byte
+            const header = cleanResponse.substring(0, landmarkIndex - 1);
+            // 2. Everything FROM the landmark forward is your Data
+            const payload = cleanResponse.substring(landmarkIndex);
+            console.log(`📡 Header: ${header} | Data: ${payload}`);
+        // }
+        //const result = masterParse(cleanResponse, currentPIDInfo.formula);
+        //console.log('RPMs: ', result); 
         // Safety check: ensure we know what we just asked for
-        if (getCurrentMode === MODES.STREAMING_PIDS) {
+        if (getCurrentMode === MODES.STREAMING_PIDS && header === ECMHeader) {
             // Fast math for RPM, Speed, etc.
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
             //updatePidValue() 
-            if (raw.startsWith("41")) {
-                const pidId = "01" + cleanResponse.substring(2, 4); // e.g., "010C"
-                const pidInfo = pidMap.get(id);
-
-                if (pidInfo) {
-                    // Call the Master Parser (Brain)
-                    const processedValue = masterParse(cleanResponse, pidInfo.formula);
-
-                    // 3. UI UPDATE (Face)
-                    updatePidValue(pidId, processedValue);
-                }
+            const pidId = "01" + cleanResponse.substring(2, 4); // e.g., "010C"
+            const pidInfo = pidMap.get(id);
+            const result = masterParse(payload, pidInfo.formula);
+            if (!Number.isNaN(result)){
+                console.log('RPMs: ', result); 
+                updatePidValue(pidId, processedValue);
             }
         } 
+
+        else if (getCurrentMode === MODES.GET_ECM_HEADER) {
+            // Need to add rpm check to above if statement for github version, 
+            // so other pids cant set ecm header
+            ECMHeader = header;
+            console.log("ECM header registered as: ", ECMHeader);
+            if(ECMHeader && !(header === ">")){
+                console.log("Get ecm header complete, switching to streaming mode...");
+                getCurrentMode = MODES.STREAMING_PIDS;
+            }
+            // Buffer and decode fault codes (e.g., 43 01 03 00 -> P0103)
+            // processDTCBuffer(hex);
+        }
 
         else if (getCurrentMode === MODES.READING_DTC) {
             // Buffer and decode fault codes (e.g., 43 01 03 00 -> P0103)
             // processDTCBuffer(hex);
         }
     });
+}
+
+export async function ping_RPM_for_header(){
+    console.log("Running ping rpm function...");
+    while(!ECMHeader){
+        console.log("ECM Header = ", ECMHeader);
+        console.log("Sending command 010C...");
+        await sendCommand("010C");
+    }
+    return ECMHeader;
 }
