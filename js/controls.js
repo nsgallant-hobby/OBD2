@@ -3,6 +3,7 @@ import { connectBluetooth, sendCommand , ping_RPM_for_header} from './Connection
 import { renderPidList } from './RenderPids.js';
 import { pidMap } from './PidMapStore.js';
 import { waitUntil, unblock_sendcommand, toggle_send_command_blocker, get_scb_value } from './Promise.js';
+import { setScannerMode, getCurrentMode, MODES } from './ScannerMode.js';
 
 // Wait for the DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,21 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Connect clicked!");
         await connectBluetooth();
         console.log('Bluetooth connected...');
-        await sendCommand("ATE1"); // turns off command echos
+        await sendCommand("ATE1"); // turns on command echos, 
+        // in streaming mode, will want command echo sent to global listener
+        
         await sendCommand("ATH1"); // Turns on headers
     });
 
     document.getElementById('LoadPidList').addEventListener('click', async () => {
         await loadPidLibrary(); 
-        const dummy = pidMap.get("010C");
-        console.log(dummy.id);
-        sendCommand(dummy.id);
-        //await ping_RPM_for_header();
-        //renderPidList();
-        //console.log("unblock send command is:", unblock_sendcommand);
-        //if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
-        //console.log("unblock send command is:", unblock_sendcommand);
-        //startSmartStreaming();
+        //const dummy = pidMap.get("010C");
+        //console.log(dummy.id);
+        //sendCommand(dummy.id);
+        await ping_RPM_for_header();
+        renderPidList();
+        console.log("unblock send command is:", unblock_sendcommand);
+        if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
+        console.log("unblock send command is:", unblock_sendcommand);
+        startSmartStreaming();
     });
 });
 

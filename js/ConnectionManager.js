@@ -1,12 +1,13 @@
-import { getCurrentMode, MODES } from './ScannerMode.js';
+import { setScannerMode, getCurrentMode, MODES } from './ScannerMode.js';
 import { pidMap } from './PidMapStore.js';
 import { updatePidValue } from './RenderPids.js';
 import { masterParse } from './MasterParser.js';
 import { toggle_send_command_blocker } from './Promise.js';
+import { get_header, register_header, HEADERS } from './Headers.js';
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 let characteristic = null;
-let ECMHeader = null;
+//let ECMHeader = null;
 let pidInfo = null;
 
 export async function connectBluetooth() {
@@ -111,7 +112,7 @@ export async function globalListener(characteristic) {
         //const result = masterParse(cleanResponse, currentPIDInfo.formula);
         //console.log('RPMs: ', result); 
         // Safety check: ensure we know what we just asked for
-        if (getCurrentMode === MODES.STREAMING_PIDS && header === ECMHeader) {
+        if (MODES.STREAMING_PIDS && header === ECMHeader) {
             // Fast math for RPM, Speed, etc.
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
@@ -125,20 +126,21 @@ export async function globalListener(characteristic) {
             }
         } 
 
-        else if (getCurrentMode === MODES.GET_ECM_HEADER) {
+        else if (MODES.GET_ECM_HEADER) {
+            console.log("ECM header mode is working...");
             // Need to add rpm check to above if statement for github version, 
             // so other pids cant set ecm header
-            ECMHeader = header;
-            console.log("ECM header registered as: ", ECMHeader);
-            if(ECMHeader && !(header === ">")){
+            register_header("ecm", header);
+            console.log("ECM header registered as: ", get_header("ecm"));
+            if(get_header("ecm") && !(header === ">")){
                 console.log("Get ecm header complete, switching to streaming mode...");
-                getCurrentMode = MODES.STREAMING_PIDS;
+                setScannerMode(MODES.STREAMING_PIDS);
             }
             // Buffer and decode fault codes (e.g., 43 01 03 00 -> P0103)
             // processDTCBuffer(hex);
         }
 
-        else if (getCurrentMode === MODES.READING_DTC) {
+        else if (MODES.READING_DTC) {
             // Buffer and decode fault codes (e.g., 43 01 03 00 -> P0103)
             // processDTCBuffer(hex);
         }
@@ -147,10 +149,13 @@ export async function globalListener(characteristic) {
 
 export async function ping_RPM_for_header(){
     console.log("Running ping rpm function...");
-    while(!ECMHeader){
-        console.log("ECM Header = ", ECMHeader);
+    while(!(get_header("ecm"))){
+        console.log("========================================");
+        console.log("ECM Header = ", get_header("ecm"));
         console.log("Sending command 010C...");
+        console.log("Gloabl listener mode = ", getCurrentMode());
+        console.log("========================================");
         await sendCommand("010C");
     }
-    return ECMHeader;
+    //return ECMHeader;
 }
