@@ -112,22 +112,23 @@ export async function globalListener(characteristic) {
         //const result = masterParse(cleanResponse, currentPIDInfo.formula);
         //console.log('RPMs: ', result); 
         // Safety check: ensure we know what we just asked for
-        if (MODES.STREAMING_PIDS && header === ECMHeader) {
+        if (getCurrentMode() === MODES.STREAMING_PIDS && header === get_header("ecm")) {
             // Fast math for RPM, Speed, etc.
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
             //updatePidValue() 
-            const pidId = "01" + cleanResponse.substring(2, 4); // e.g., "010C"
-            const pidInfo = pidMap.get(id);
-            const result = masterParse(payload, pidInfo.formula);
+            const pidId = "01" + payload.substring(3, 5); // e.g., "010C"
+            const loadedPid = pidMap.get(pidInfo);
+            const result = masterParse(payload, loadedPid.formula);
             if (!Number.isNaN(result)){
-                console.log('RPMs: ', result); 
-                updatePidValue(pidId, processedValue);
+                console.log('RPMs: ', result, ', pidId: ', pidId); 
+                updatePidValue(pidId, result);
             }
         } 
 
-        else if (MODES.GET_ECM_HEADER) {
+        else if (getCurrentMode() === MODES.GET_ECM_HEADER) {
             console.log("ECM header mode is working...");
+            console.log("Scanner mode = ", getCurrentMode());
             // Need to add rpm check to above if statement for github version, 
             // so other pids cant set ecm header
             register_header("ecm", header);

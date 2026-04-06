@@ -4,6 +4,7 @@ import { renderPidList } from './RenderPids.js';
 import { pidMap } from './PidMapStore.js';
 import { waitUntil, unblock_sendcommand, toggle_send_command_blocker, get_scb_value } from './Promise.js';
 import { setScannerMode, getCurrentMode, MODES } from './ScannerMode.js';
+import { get_header, register_header, HEADERS } from './Headers.js';
 
 // Wait for the DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,14 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('LoadPidList').addEventListener('click', async () => {
         await loadPidLibrary(); 
-        //const dummy = pidMap.get("010C");
-        //console.log(dummy.id);
-        //sendCommand(dummy.id);
         await ping_RPM_for_header();
         renderPidList();
-        console.log("unblock send command is:", unblock_sendcommand);
+        //console.log("unblock send command is:", unblock_sendcommand);
         if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
-        console.log("unblock send command is:", unblock_sendcommand);
+       // console.log("==============================================");
+       // console.log("unblock send command is:", unblock_sendcommand);
+       // console.log("Scanner mode = ", getCurrentMode());
+       // console.log("ECM Header = ", get_header("ecm"));
+       // console.log("==============================================");
         startSmartStreaming();
     });
 });
