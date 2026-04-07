@@ -3,16 +3,14 @@
     "id": "010C",
     "name": "Engine RPM",
     "formula": "((256 * A) + B) / 4",
-    "unit": "RPM",
-    "description": "Engine rotations per minute", 
+    "unit": "RPM", 
     "refreshrate": 50
   },
   {
     "id": "010D",
     "name": "Vehicle Speed",
     "formula": "A",
-    "unit": "km/h",
-    "description": "Current speed of the vehicle", 
+    "unit": "km/h", 
     "refreshrate": 100
   },
   {
@@ -20,7 +18,6 @@
     "name": "Engine Coolant Temp",
     "formula": "A - 40",
     "unit": "°C",
-    "description": "Temperature of the engine coolant", 
     "refreshrate": 5000
   },
   {
@@ -28,7 +25,6 @@
     "name": "Throttle Position",
     "formula": "(A * 100) / 255",
     "unit": "%",
-    "description": "Percentage of throttle opening",
     "refreshrate": 100
   },
   {
@@ -36,7 +32,6 @@
     "name": "Calculated Engine Load",
     "formula": "(A * 100) / 255",
     "unit": "%",
-    "description": "Current engine load percentage",
     "refreshrate": 100
   },
   {
@@ -44,7 +39,34 @@
     "name": "Intake Air Temp",
     "formula": "A - 40",
     "unit": "°C",
-    "description": "Temperature of air entering the engine",
     "refreshrate": 5000
+  },
+  {
+    "id": "0106",
+    "name": "Short Term Fuel Trim(STFT) Bank 1",
+    "formula": "(A / 1.28) - 100",
+    "unit": "%",
+    "refreshrate": 100
+  },
+  {
+    "id": "0107",
+    "name": "Long Term Fuel Trim(LTFT) Bank 1",
+    "formula": "(A / 1.28) - 100",
+    "unit": "%",
+    "refreshrate": 100
+  },
+  {
+    "id": "0108",
+    "name": "Short Term Fuel Trim(STFT) Bank 2",
+    "formula": "(A / 1.28) - 100",
+    "unit": "%",
+    "refreshrate": 100
+  },
+  {
+    "id": "0109",
+    "name": "Long Term Fuel Trim(LTFT) Bank 2",
+    "formula": "(A / 1.28) - 100",
+    "unit": "%",
+    "refreshrate": 100
   }
 ]

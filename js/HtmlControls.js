@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
        // console.log("Scanner mode = ", getCurrentMode());
        // console.log("ECM Header = ", get_header("ecm"));
        // console.log("==============================================");
+       //await sendCommand("010C");
         startSmartStreaming();
     });
 });
