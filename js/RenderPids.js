@@ -25,6 +25,7 @@ export function updatePidValue(pidId, newValue) {
         
         // Visual flair: Flash green on update
         element.style.color = "#00ff00";
-        setTimeout(() => { element.style.color = "white"; }, 100);
+        setTimeout(() => { element.style.color = "black"; }, 100);
     }
+    console.log("Update PID success!");
 }

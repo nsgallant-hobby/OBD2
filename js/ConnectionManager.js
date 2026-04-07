@@ -83,7 +83,7 @@ export async function globalListener(characteristic) {
         // ...textResponse.replace(/>|\r/g, '')...
         let cleanResponse = textResponse.replace(/|\r/g, '').trim();
         console.log("Clean response = ", cleanResponse);
-        if(cleanResponse === ">") toggle_send_command_blocker(); 
+        if(cleanResponse.includes(">")) toggle_send_command_blocker(); 
         if(cleanResponse.length === 4 && !(cleanResponse === "SEAR")) {
             pidInfo = cleanResponse;
             console.log("Pid id = ", pidInfo);
@@ -112,7 +112,7 @@ export async function globalListener(characteristic) {
         //const result = masterParse(cleanResponse, currentPIDInfo.formula);
         //console.log('RPMs: ', result); 
         // Safety check: ensure we know what we just asked for
-        if (getCurrentMode() === MODES.STREAMING_PIDS && header === get_header("ecm")) {
+        if (getCurrentMode() === MODES.STREAMING_PIDS) {
             // Fast math for RPM, Speed, etc.
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
@@ -120,8 +120,9 @@ export async function globalListener(characteristic) {
             const pidId = "01" + payload.substring(3, 5); // e.g., "010C"
             const loadedPid = pidMap.get(pidInfo);
             const result = masterParse(payload, loadedPid.formula);
+            console.log("Master parse result: payload = ", payload, ", masterparse result = ", result);
             if (!Number.isNaN(result)){
-                console.log('RPMs: ', result, ', pidId: ', pidId); 
+                console.log('Value: ', result, ', pidId: ', pidId); 
                 updatePidValue(pidId, result);
             }
         } 
