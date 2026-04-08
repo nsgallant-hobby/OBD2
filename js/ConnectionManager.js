@@ -6,6 +6,9 @@ import { toggle_send_command_blocker } from './Promise.js';
 import { get_header, register_header, HEADERS } from './Headers.js';
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+const nameDisplay = document.getElementById('device-name');
+const statusDisplay = document.getElementById('connection-status');
+
 let characteristic = null;
 //let ECMHeader = null;
 let pidInfo = null;
@@ -22,6 +25,7 @@ export async function connectBluetooth() {
     console.log('Connecting to GATT Server...');
     const server = await device.gatt.connect();
     console.log('Connected:', device.name);
+    onConnect(device);
 
     const service = await server.getPrimaryService(ELM327_SERVICE_UUID);
     characteristic = await service.getCharacteristic('bef8d6c9-9c21-4c9e-b632-bd58c1009f9f');
@@ -45,6 +49,7 @@ export async function connectBluetooth() {
     
   } catch (error) {
     console.error('Error:', error);
+    onDisconnect();
   }
 }
 
@@ -54,6 +59,28 @@ export async function getPipeline() {
         return null;
     }
     return characteristic;
+}
+
+async function onConnect(device) {
+    // 1. Update the Name
+    // Some dongles don't broadcast a name, so we provide a fallback
+    nameDisplay.innerText = device.name || "Generic OBD Device";
+
+    // 2. Update the Status UI
+    statusDisplay.innerText = "● Connected";
+    statusDisplay.style.color = "#00ff00"; // Green
+
+    // 3. Listen for unexpected disconnects (e.g., walking away from the car)
+    device.addEventListener('gattserverdisconnected', onDisconnect);
+}
+
+function onDisconnect() {
+    // Reset the UI when the connection drops
+    nameDisplay.innerText = "Not Connected";
+    statusDisplay.innerText = "● Disconnected";
+    statusDisplay.style.color = "red";
+    
+    // Clear any active PID expectations in the manager
 }
 
 // sendCommand is a send-instructions-to-the-obd function.
