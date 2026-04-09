@@ -1,5 +1,5 @@
 import { waitUntil, unblock_sendcommand, toggle_send_command_blocker, get_scb_value } from './Promise.js';
-import { sendCommand } from './ConnectionManager.js';
+import { sendCommand } from './CommunicationManager.js';
 import { pidMap } from './PidMapStore.js';
 
 let schedulerInterval = null;

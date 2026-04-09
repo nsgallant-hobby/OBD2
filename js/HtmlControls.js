@@ -1,5 +1,6 @@
 import { loadPidLibrary } from './LoadLibrary.js';
-import { connectBluetooth, sendCommand , ping_RPM_for_header} from './ConnectionManager.js';
+import { connectBluetooth } from './ConnectionManager.js';
+import { sendCommand } from './CommunicationManager.js';
 import { renderPidList } from './RenderPids.js';
 import { toggle_send_command_blocker, get_scb_value } from './Promise.js';
 import { startSmartStreaming, stopSmartStreaming } from './SmartStreaming.js';
@@ -20,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('LoadPidList').addEventListener('click', async () => {
         await loadPidLibrary(); 
-        await ping_RPM_for_header();
         renderPidList();
         //console.log("unblock send command is:", unblock_sendcommand);
         if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true

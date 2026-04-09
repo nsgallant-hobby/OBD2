@@ -1,30 +1,15 @@
 [
-  { "id": "010C", "name": "Engine RPM",                        "formula": "((256 * A) + B) / 4", "unit": "RPM",  "refreshrate": 50 },
-  { "id": "010D", "name": "Vehicle Speed",                     "formula": "A",                   "unit": "km/h", "refreshrate": 100 },
-  { "id": "0105", "name": "Engine Coolant Temp",               "formula": "A - 40",              "unit": "°C",   "refreshrate": 5000 },
-  { "id": "0111", "name": "Throttle Position",                 "formula": "(100 / 255) * A",     "unit": "%",    "refreshrate": 100 },
-  { "id": "0104", "name": "Calculated Engine Load",            "formula": "(A * 100) / 255",     "unit": "%",    "refreshrate": 100 },
-  { "id": "010F", "name": "Intake Air Temp",                   "formula": "A - 40",              "unit": "°C",   "refreshrate": 5000 },
-  { "id": "0106", "name": "Short Term Fuel Trim(STFT) Bank 1", "formula": "(A / 1.28) - 100",    "unit": "%",    "refreshrate": 100 },
-  {
-    "id": "0107",
-    "name": "Long Term Fuel Trim(LTFT) Bank 1",
-    "formula": "(A / 1.28) - 100",
-    "unit": "%",
-    "refreshrate": 100
-  },
-  {
-    "id": "0108",
-    "name": "Short Term Fuel Trim(STFT) Bank 2",
-    "formula": "(A / 1.28) - 100",
-    "unit": "%",
-    "refreshrate": 100
-  },
-  {
-    "id": "0109",
-    "name": "Long Term Fuel Trim(LTFT) Bank 2",
-    "formula": "(A / 1.28) - 100",
-    "unit": "%",
-    "refreshrate": 100
-  }
+  { "id": "010C", "name": "Engine RPM",                                      "formula": "((256 * A) + B) / 4", "unit": "RPM",  "refreshrate": 50 },
+  { "id": "010D", "name": "Vehicle Speed",                                   "formula": "A",                   "unit": "km/h", "refreshrate": 100 },
+  { "id": "0105", "name": "Engine Coolant Temp",                             "formula": "A - 40",              "unit": "°C",   "refreshrate": 5000 },
+  { "id": "0111", "name": "Throttle Position",                               "formula": "(100 / 255) * A",     "unit": "%",    "refreshrate": 100 },
+  { "id": "0104", "name": "Calculated Engine Load",                          "formula": "(A * 100) / 255",     "unit": "%",    "refreshrate": 100 },
+  { "id": "010F", "name": "Intake Air Temp",                                 "formula": "A - 40",              "unit": "°C",   "refreshrate": 5000 },
+  { "id": "0106", "name": "Short Term Fuel Trim(STFT) Bank 1",               "formula": "(A / 1.28) - 100",    "unit": "%",    "refreshrate": 100 },
+  { "id": "0107", "name": "Long Term Fuel Trim(LTFT) Bank 1",                "formula": "(A / 1.28) - 100",    "unit": "%",    "refreshrate": 100 },
+  { "id": "0108", "name": "Short Term Fuel Trim(STFT) Bank 2",               "formula": "(A / 1.28) - 100",    "unit": "%",    "refreshrate": 100 },
+  { "id": "0109", "name": "Long Term Fuel Trim(LTFT) Bank 2",                "formula": "(A / 1.28) - 100",    "unit": "%",    "refreshrate": 100 },
+  { "id": "010A", "name": "Fuel Rail Pressure(Relative To Manifold Vacuum)", "formula": "3 * A",               "unit": "kpa",  "refreshrate": 100 },
+  { "id": "010B", "name": "Intake Manifold Absolute Pressure",               "formula": "A",                   "unit": "kpa",  "refreshrate": 100 },
+  { "id": "010E", "name": "Timing Advance(Before TDC)",                      "formula": "(A / 2) - 64",        "unit": "°deg", "refreshrate": 50 }
 ]
