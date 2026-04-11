@@ -1,6 +1,7 @@
 import { waitUntil, unblock_sendcommand, toggle_send_command_blocker, get_scb_value } from './Promise.js';
 import { sendCommand } from './CommunicationManager.js';
 import { pidMap } from './PidMapStore.js';
+import { scanner } from './RenderPids.js';
 
 let schedulerInterval = null;
 
@@ -13,7 +14,10 @@ export async function startSmartStreaming() {
     schedulerInterval = setInterval(async () => {
         const now = Date.now();
         
-        for (const [id, pid] of pidMap) {
+        for (const hex of scanner.activeQueue) {
+            const pid = pidMap.get(hex);
+            
+            console.log(`Would send pid - ${pid.service}${pid.id}`);
             //console.log("For loop is running...")
             await waitUntil(() => unblock_sendcommand);
             //console.log("unblock send command is:", unblock_sendcommand);
@@ -31,6 +35,7 @@ export async function startSmartStreaming() {
                 //console.log("unblock send command should be false, but is:", unblock_sendcommand);
                 //console.log("Sending command ", id);
                 await sendCommand(id);
+               
                 } catch(error) {
                     console.log("Error caught", error);
                     if (error.message.includes("GATT")) {

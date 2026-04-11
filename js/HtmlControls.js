@@ -2,6 +2,7 @@ import { loadPidLibrary } from './LoadLibrary.js';
 import { connectBluetooth } from './ConnectionManager.js';
 import { sendCommand } from './CommunicationManager.js';
 import { renderPidList } from './RenderPids.js';
+import { scanner } from './RenderPids.js';
 import { toggle_send_command_blocker, get_scb_value } from './Promise.js';
 import { startSmartStreaming, stopSmartStreaming } from './SmartStreaming.js';
 
@@ -22,8 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('LoadPidList').addEventListener('click', async () => {
         await loadPidLibrary(); 
         renderPidList();
+        console.log(scanner.activeQueue);
         //console.log("unblock send command is:", unblock_sendcommand);
-        if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
+        //if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
        // console.log("==============================================");
        // console.log("unblock send command is:", unblock_sendcommand);
        // console.log("Scanner mode = ", getCurrentMode());

@@ -1,14 +1,19 @@
+// =============================================================================================
+// Communication Manager
+// =====================
+// This module handles obd dongle-to-vehicle communication with sendCommand, and obd vehicle-to-
+// dongle listening with globalListener.
+// - getPipeline holds the active bluetooth communication pipeline with the obd device
+// =============================================================================================
+
 import { getPipeline } from "./ConnectionManager.js";
 import { pidMap } from "./PidMapStore.js";
 import { getCurrentMode } from "./ScannerMode.js";
 import { masterParse } from "./MasterParser.js";
 import { updatePidValue } from "./RenderPids.js";
 
-// sendCommand is a send-instructions-to-the-obd function.
-// Remember we already have a obd listener(myChar) set up in bluetooth connection function
 export async function sendCommand(command) {
     const pipe = await getPipeline();
-    //console.log("Pipe object:", pipe);
     const encoder = new TextEncoder();
     // Commands must end with \r for the ELM327 to process them
     const data = encoder.encode(command + '\r');
@@ -65,9 +70,10 @@ export async function globalListener(characteristic) {
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
             //updatePidValue() 
-            const pidId = "01" + payload.substring(3, 5); // e.g., "010C"
-            const loadedPid = pidMap.get(pidInfo);
-            const result = masterParse(payload, loadedPid.formula);
+            const pidId = payload.substring(3, 5); // e.g., "010C"
+            const loadedPid = pidMap.get(pidId);
+            const result = loadedPid.calc(...bytes);
+            //const result = masterParse(payload, loadedPid.formula);
             console.log("Master parse result: payload = ", payload, ", masterparse result = ", result);
             if (!Number.isNaN(result)){
                 console.log('Value: ', result, ', pidId: ', pidId); 

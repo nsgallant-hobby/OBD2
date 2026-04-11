@@ -1,5 +1,3 @@
-import { getCurrentMode } from './ScannerMode.js';
-import { get_header } from './Headers.js';
 import { globalListener } from './CommunicationManager.js';
 
 const ELM327_SERVICE_UUID = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
