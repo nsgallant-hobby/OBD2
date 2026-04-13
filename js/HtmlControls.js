@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Connect clicked!");
         await connectBluetooth();
         console.log('Bluetooth connected...');
-        await sendCommand("ATE1"); // turns on command echos, 
+        await sendCommand("ATE0"); // turns on command echos, 
         // in streaming mode, will want command echo sent to global listener
         
         await sendCommand("ATH1"); // Turns on headers
@@ -23,16 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('LoadPidList').addEventListener('click', async () => {
         await loadPidLibrary(); 
         renderPidList();
-        console.log(scanner.activeQueue);
+        //console.log(scanner.activeQueue);
         //console.log("unblock send command is:", unblock_sendcommand);
-        //if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
+        if(!get_scb_value()) toggle_send_command_blocker(); //if false, switch unblock to true
        // console.log("==============================================");
        // console.log("unblock send command is:", unblock_sendcommand);
        // console.log("Scanner mode = ", getCurrentMode());
        // console.log("ECM Header = ", get_header("ecm"));
        // console.log("==============================================");
-       //await sendCommand("010C");
-        startSmartStreaming();
+       await sendCommand("010C");
+        //startSmartStreaming();
     });
 });
 

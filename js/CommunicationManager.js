@@ -11,6 +11,7 @@ import { pidMap } from "./PidMapStore.js";
 import { getCurrentMode } from "./ScannerMode.js";
 import { masterParse } from "./MasterParser.js";
 import { updatePidValue } from "./RenderPids.js";
+import { toggle_send_command_blocker } from "./Promise.js";
 
 export async function sendCommand(command) {
     const pipe = await getPipeline();
@@ -31,24 +32,27 @@ export async function globalListener(characteristic) {
         const textResponse = decoder.decode(buffer);
 
         // 3. CLEAN: Remove weird characters like > or \r
-        // want to keep > for now, to signal end of multiline response from obd
+        // check for end of data ">" before deleting
         // orignally line looked like this
         // ...textResponse.replace(/>|\r/g, '')...
-        let cleanResponse = textResponse.replace(/|\r/g, '').trim();
-        console.log("Clean response = ", cleanResponse);
-        if(cleanResponse.includes(">")) toggle_send_command_blocker(); 
-        if(cleanResponse.length === 4 && !(cleanResponse === "SEAR")) {
-            pidInfo = cleanResponse;
-            console.log("Pid id = ", pidInfo);
-        }
-        console.log("pidInfo = ", pidInfo);
-        const landmark = "41 " + pidInfo.slice(-2);
-        console.log("landmark = ", landmark);
-        const landmarkIndex = cleanResponse.indexOf(landmark);
-        console.log("landmarkIndex = ", landmarkIndex);
         
-        const count = cleanResponse.split(landmark).length - 1;
-        const isRepeated = count > 1; 
+        let cleanResponse = textResponse.replace(/|\r/g, '').trim();
+        if(cleanResponse.includes(">")) toggle_send_command_blocker();
+        console.log("Clean response = ", cleanResponse);
+         
+        const fourtyOneIndex = cleanResponse.indexOf("41");
+        console.log("Instance of 41 at position: ", fourtyOneIndex);
+
+        const count = cleanResponse.split("41");//.length - 1;
+        const isRepeated = count > 2;
+        console.log("count = ", count, ", isRepeated = ", isRepeated);
+        //const landmark = "41 " + pidInfo.slice(-2);
+        //console.log("landmark = ", landmark);
+        //const landmarkIndex = cleanResponse.indexOf(landmark);
+        //console.log("landmarkIndex = ", landmarkIndex);
+        
+        //const count = cleanResponse.split(landmark).length - 1;
+        //const isRepeated = count > 1; 
         if(isRepeated){
             const halfLength = Math.floor(cleanResponse.length / 2);
             const firstHalf = cleanResponse.substring(0, halfLength);
