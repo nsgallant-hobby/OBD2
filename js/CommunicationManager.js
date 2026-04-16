@@ -10,6 +10,7 @@ import { getPipeline } from "./ConnectionManager.js";
 import { pidMap } from "./PidMapStore.js";
 import { getCurrentMode } from "./ScannerMode.js";
 import { masterParse } from "./MasterParser.js";
+import { MODES } from "./ScannerMode.js";
 import { updatePidValue } from "./RenderPids.js";
 import { toggle_send_command_blocker } from "./Promise.js";
 
@@ -43,10 +44,15 @@ export async function globalListener(characteristic) {
         const fourtyOneIndex = cleanResponse.indexOf("41");
         console.log("Instance of 41 at position: ", fourtyOneIndex);
 
-        const count = cleanResponse.split(" 41 ");//.length - 1;
-        const isRepeated = count > 2;
-        console.log("count = ", count, ", isRepeated = ", isRepeated);
-        console.log("count[1] = ", count[1]);
+        //const count = cleanResponse.split(" 41 ");//.length - 1;
+        //const isRepeated = count > 2;
+        //console.log("count = ", count, ", isRepeated = ", isRepeated);
+        
+        const getPid = cleanResponse.substring(fourtyOneIndex + 3, fourtyOneIndex + 5);
+        console.log("Get pid attempt: ", getPid);
+
+        const payload = cleanResponse.substring(fourtyOneIndex + 6, fourtyOneIndex + 11); // PID may not be 00 00 format
+        console.log("Payload get: ", payload);
         //const landmark = "41 " + pidInfo.slice(-2);
         //console.log("landmark = ", landmark);
         //const landmarkIndex = cleanResponse.indexOf(landmark);
@@ -54,18 +60,18 @@ export async function globalListener(characteristic) {
         
         //const count = cleanResponse.split(landmark).length - 1;
         //const isRepeated = count > 1; 
-        if(isRepeated){
-            const halfLength = Math.floor(cleanResponse.length / 2);
-            const firstHalf = cleanResponse.substring(0, halfLength);
-            if(firstHalf) cleanResponse = firstHalf;
-        }
+        //if(isRepeated){
+        //    const halfLength = Math.floor(cleanResponse.length / 2);
+        //    const firstHalf = cleanResponse.substring(0, halfLength);
+        //    if(firstHalf) cleanResponse = firstHalf;
+        //}
         //if (landmarkIndex !== -1) {
             // 1. Everything BEFORE the landmark (minus the 1-byte PCI length) is the Header
             // We subtract 2 hex characters to remove the '04' or '03' length byte
-            const header = cleanResponse.substring(0, landmarkIndex - 1);
+            //const header = cleanResponse.substring(0, landmarkIndex - 1);
             // 2. Everything FROM the landmark forward is your Data
-            const payload = cleanResponse.substring(landmarkIndex);
-            console.log(`📡 Header: ${header} | Data: ${payload}`);
+            //const payload = cleanResponse.substring(landmarkIndex);
+            //console.log(`📡 Header: ${header} | Data: ${payload}`);
         // }
         //const result = masterParse(cleanResponse, currentPIDInfo.formula);
         //console.log('RPMs: ', result); 
@@ -75,8 +81,8 @@ export async function globalListener(characteristic) {
             //const result = masterParse(cleanResponse, currentPIDInfo.formula);
             //console.log('RPMs: ', result); 
             //updatePidValue() 
-            const pidId = payload.substring(3, 5); // e.g., "010C"
-            const loadedPid = pidMap.get(pidId);
+            //const pidId = payload.substring(3, 5); // e.g., "010C"
+            const loadedPid = pidMap.get("01" + getPid); // "01" will be be a var in the future based on pid service mode
             const result = loadedPid.calc(...bytes);
             //const result = masterParse(payload, loadedPid.formula);
             console.log("Master parse result: payload = ", payload, ", masterparse result = ", result);
