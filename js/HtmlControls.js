@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // in streaming mode, will want command echo sent to global listener
         
         await sendCommand("ATH1"); // Turns on headers
+        //await sendCommand("ATL0");
     });
 
     document.getElementById('LoadPidList').addEventListener('click', async () => {

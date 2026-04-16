@@ -43,9 +43,10 @@ export async function globalListener(characteristic) {
         const fourtyOneIndex = cleanResponse.indexOf("41");
         console.log("Instance of 41 at position: ", fourtyOneIndex);
 
-        const count = cleanResponse.split("41");//.length - 1;
+        const count = cleanResponse.split(" 41 ");//.length - 1;
         const isRepeated = count > 2;
         console.log("count = ", count, ", isRepeated = ", isRepeated);
+        console.log("count[1] = ", count[1]);
         //const landmark = "41 " + pidInfo.slice(-2);
         //console.log("landmark = ", landmark);
         //const landmarkIndex = cleanResponse.indexOf(landmark);
